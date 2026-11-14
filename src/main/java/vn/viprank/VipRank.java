@@ -216,6 +216,30 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
         if (online != null) {
             applyRank(online);
         }
+        syncLuckPerms(name, rank);
+    }
+
+    // ------------------------------------------------------------ LuckPerms
+
+    /**
+     * Doi nhom LuckPerms theo rank (chay lenh tu console, khong can LuckPerms API).
+     * Nhom LuckPerms phai ton tai san voi ten trung ten rank (xem luckperms-setup.txt).
+     */
+    private void syncLuckPerms(String playerName, String rank) {
+        if (!getConfig().getBoolean("luckperms.enabled", true)) {
+            return;
+        }
+        if (getServer().getPluginManager().getPlugin("LuckPerms") == null) {
+            getLogger().warning("luckperms.enabled=true nhung server khong co LuckPerms, bo qua.");
+            return;
+        }
+        for (String cmd : getConfig().getStringList("luckperms.commands")) {
+            if (cmd == null || cmd.isEmpty()) {
+                continue;
+            }
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                    cmd.replace("%player%", playerName).replace("%group%", rank));
+        }
     }
 
     // ------------------------------------------------------------ apply (quyen + tab)
@@ -309,7 +333,13 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        applyRank(e.getPlayer());
+        Player p = e.getPlayer();
+        // Nguoi chua tung co rank luu -> dat rank mac dinh (dong thoi dat nhom LuckPerms)
+        if (players.getString("players." + p.getUniqueId() + ".rank") == null) {
+            setRank(p.getUniqueId(), p.getName(), defaultRank());
+        } else {
+            applyRank(p);
+        }
     }
 
     @EventHandler
@@ -634,6 +664,16 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
                 }
                 adminSet(sender, args[1], args[2]);
                 return true;
+            case "sync":
+                if (!sender.hasPermission("viprank.admin")) {
+                    say(sender, "no-permission");
+                    return true;
+                }
+                for (Player online : Bukkit.getOnlinePlayers()) {
+                    syncLuckPerms(online.getName(), getRank(online.getUniqueId()));
+                }
+                say(sender, "synced");
+                return true;
             case "reload":
                 if (!sender.hasPermission("viprank.admin")) {
                     say(sender, "no-permission");
@@ -712,7 +752,7 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
         String cmd = command.getName().toLowerCase(Locale.ROOT);
         if (cmd.equals("rank")) {
             if (args.length == 1) {
-                for (String s : new String[] {"list", "buy", "info", "set", "reload"}) {
+                for (String s : new String[] {"list", "buy", "info", "set", "sync", "reload"}) {
                     if (s.startsWith(args[0].toLowerCase(Locale.ROOT))) {
                         out.add(s);
                     }

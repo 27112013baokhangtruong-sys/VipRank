@@ -40,6 +40,16 @@ nametag:
 # Số 'homes' bên dưới chỉ để HIỂN THỊ trong menu, phải khớp với số trong config Essentials.
 essentials-homes: true
 
+# Tích hợp LuckPerms: mỗi khi rank của người chơi đổi (mua bằng /rank buy hoặc /rank set),
+# plugin chạy các lệnh dưới đây từ console để đổi nhóm LuckPerms. %group% = tên rank.
+# Cần tạo sẵn các nhóm LuckPerms trùng tên rank (xem file luckperms-setup.txt đi kèm).
+# Người mới vào lần đầu cũng được đặt vào nhóm của rank mặc định.
+# Gõ /rank sync để đặt lại nhóm LuckPerms cho tất cả người đang online.
+luckperms:
+  enabled: true
+  commands:
+    - 'lp user %player% parent set %group%'
+
 # Danh sách rank, THỨ TỰ từ thấp đến cao.
 #   display:     tiền tố hiện ở chat, tab, trên đầu (hỗ trợ mã màu &)
 #   icon:        vật phẩm đại diện rank trong menu /rank buy (tên Material, VD EMERALD)
@@ -145,11 +155,12 @@ messages:
   bought: '%prefix% &aĐã mua rank %rank% &avới &f%cost% %currency%&a. Bạn có tối đa &f%homes% &ahome!'
   broadcast: '%prefix% &f%player% &7vừa mua rank %rank%&7!'
   rank-set: '%prefix% &aĐã đặt rank của &f%player% &athành %rank%&a.'
+  synced: '%prefix% &aĐã đặt lại nhóm LuckPerms cho người chơi đang online.'
   reloaded: '%prefix% &aĐã tải lại cấu hình VipRank!'
   info: '%prefix% &f%player% &7đang có rank %rank% &7(tối đa &f%homes% &7home).'
   list-header: '%prefix% &7Danh sách rank:'
   list-line: ' &8- %rank% &8| &f%price% &8| &f%homes% &7home'
-  usage-rank: '%prefix% &7Cú pháp: &c/rank list &8| &c/rank buy [rank] &8| &c/rank info &8| &c/rank set <tên> <rank> &8| &c/rank reload'
+  usage-rank: '%prefix% &7Cú pháp: &c/rank list &8| &c/rank buy [rank] &8| &c/rank info &8| &c/rank set <tên> <rank> &8| &c/rank sync &8| &c/rank reload'
   usage-buy: '%prefix% &7Cú pháp: &c/rank buy <rank>'
   usage-set: '%prefix% &7Cú pháp: &c/rank set <tên> <rank>'
   nothing-to-deposit: '%prefix% &cBạn không có %currency% nào trong túi để nạp.'

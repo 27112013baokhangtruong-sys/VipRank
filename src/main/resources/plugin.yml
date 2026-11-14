@@ -1,7 +1,7 @@
 name: VipRank
 version: 1.0.0
 main: vn.viprank.VipRank
-api-version: '1.21'
+api-version: '26.1'
 description: Rank mua bang kim cuong - cap quyen va so home EssentialsX theo rank.
 commands:
   rank:

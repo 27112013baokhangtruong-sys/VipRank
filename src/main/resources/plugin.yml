@@ -1,0 +1,17 @@
+name: VipRank
+version: 1.0.0
+main: vn.viprank.VipRank
+api-version: '1.21'
+description: Rank mua bang kim cuong - cap quyen va so home EssentialsX theo rank.
+commands:
+  rank:
+    description: Xem, mua va quan ly rank
+    usage: /rank <list|buy|info|set|reload>
+    aliases: [ranks]
+permissions:
+  viprank.buy:
+    description: Dung /rank buy
+    default: true
+  viprank.admin:
+    description: /rank set, /rank reload, xem rank nguoi khac
+    default: op

@@ -662,6 +662,17 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
         return rankCommand(sender, args);
     }
 
+    /**
+     * Quyen admin. Mac dinh (admin-op-only: true) chi OP va console moi la admin, ke ca khi
+     * plugin quyen cap "*" cho nguoi thuong. Dat false de dung quyen viprank.admin.
+     */
+    private boolean isAdmin(CommandSender s) {
+        if (getConfig().getBoolean("admin-op-only", true)) {
+            return s.isOp();
+        }
+        return s.hasPermission("viprank.admin");
+    }
+
     private boolean rankCommand(CommandSender sender, String[] args) {
         String sub = args.length == 0 ? "info" : args[0].toLowerCase(Locale.ROOT);
         switch (sub) {
@@ -687,7 +698,7 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
                 showInfo(sender, args.length > 1 ? args[1] : null);
                 return true;
             case "set":
-                if (!sender.hasPermission("viprank.admin")) {
+                if (!isAdmin(sender)) {
                     say(sender, "no-permission");
                     return true;
                 }
@@ -698,7 +709,7 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
                 adminSet(sender, args[1], args[2]);
                 return true;
             case "setup":
-                if (!sender.hasPermission("viprank.admin")) {
+                if (!isAdmin(sender)) {
                     say(sender, "no-permission");
                     return true;
                 }
@@ -724,7 +735,7 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
                 }, delay + 20L);
                 return true;
             case "sync":
-                if (!sender.hasPermission("viprank.admin")) {
+                if (!isAdmin(sender)) {
                     say(sender, "no-permission");
                     return true;
                 }
@@ -734,7 +745,7 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
                 say(sender, "synced");
                 return true;
             case "reload":
-                if (!sender.hasPermission("viprank.admin")) {
+                if (!isAdmin(sender)) {
                     say(sender, "no-permission");
                     return true;
                 }
@@ -771,7 +782,7 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
             id = ((Player) sender).getUniqueId();
             name = sender.getName();
         } else {
-            if (!sender.hasPermission("viprank.admin") && !who.equalsIgnoreCase(sender.getName())) {
+            if (!isAdmin(sender) && !who.equalsIgnoreCase(sender.getName())) {
                 say(sender, "no-permission");
                 return;
             }

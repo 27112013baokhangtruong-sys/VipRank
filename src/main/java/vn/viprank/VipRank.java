@@ -221,6 +221,39 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
 
     // ------------------------------------------------------------ LuckPerms
 
+    /** Cac lenh LuckPerms de tao nhom va cap quyen cho tung rank (dung cho /rank setup). */
+    private List<String> luckPermsSetupCommands() {
+        List<String> out = new ArrayList<>();
+        List<String> acc = new ArrayList<>();
+        List<String> ids = rankIds();
+        boolean homes = getConfig().getBoolean("essentials-homes", true);
+        for (int i = 0; i < ids.size(); i++) {
+            String id = ids.get(i);
+            // quyen cua rank nay + cac rank thap hon (nhom khong ke thua nhom rank khac)
+            for (String perm : getConfig().getStringList("ranks." + rankKey(id) + ".permissions")) {
+                if (perm != null && !perm.isEmpty() && !acc.contains(perm)) {
+                    acc.add(perm);
+                }
+            }
+            out.add("lp creategroup " + id);
+            out.add("lp group " + id + " parent add default");
+            out.add("lp group " + id + " setweight " + ((i + 1) * 10));
+            if (homes) {
+                out.add("lp group " + id + " permission set essentials.sethome true");
+                out.add("lp group " + id + " permission set essentials.sethome.multiple true");
+                out.add("lp group " + id + " permission set essentials.sethome.multiple." + id + " true");
+            }
+            for (String perm : acc) {
+                if (perm.startsWith("-")) {
+                    out.add("lp group " + id + " permission set " + perm.substring(1) + " false");
+                } else {
+                    out.add("lp group " + id + " permission set " + perm + " true");
+                }
+            }
+        }
+        return out;
+    }
+
     /**
      * Doi nhom LuckPerms theo rank (chay lenh tu console, khong can LuckPerms API).
      * Nhom LuckPerms phai ton tai san voi ten trung ten rank (xem luckperms-setup.txt).
@@ -664,6 +697,32 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
                 }
                 adminSet(sender, args[1], args[2]);
                 return true;
+            case "setup":
+                if (!sender.hasPermission("viprank.admin")) {
+                    say(sender, "no-permission");
+                    return true;
+                }
+                if (getServer().getPluginManager().getPlugin("LuckPerms") == null) {
+                    say(sender, "no-luckperms");
+                    return true;
+                }
+                List<String> cmds = luckPermsSetupCommands();
+                say(sender, "setup-start", "count", String.valueOf(cmds.size()));
+                long delay = 0L;
+                for (String cmd : cmds) {
+                    final String run = cmd;
+                    // chay lan luot, cach nhau vai tick de LuckPerms kip tao nhom truoc khi cap quyen
+                    Bukkit.getScheduler().runTaskLater(this,
+                            () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), run), delay);
+                    delay += 3L;
+                }
+                Bukkit.getScheduler().runTaskLater(this, () -> {
+                    for (Player online : Bukkit.getOnlinePlayers()) {
+                        syncLuckPerms(online.getName(), getRank(online.getUniqueId()));
+                    }
+                    say(sender, "setup-done");
+                }, delay + 20L);
+                return true;
             case "sync":
                 if (!sender.hasPermission("viprank.admin")) {
                     say(sender, "no-permission");
@@ -752,7 +811,7 @@ public class VipRank extends JavaPlugin implements Listener, CommandExecutor, Ta
         String cmd = command.getName().toLowerCase(Locale.ROOT);
         if (cmd.equals("rank")) {
             if (args.length == 1) {
-                for (String s : new String[] {"list", "buy", "info", "set", "sync", "reload"}) {
+                for (String s : new String[] {"list", "buy", "info", "set", "setup", "sync", "reload"}) {
                     if (s.startsWith(args[0].toLowerCase(Locale.ROOT))) {
                         out.add(s);
                     }

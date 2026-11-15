@@ -44,6 +44,7 @@ essentials-homes: true
 # plugin chạy các lệnh dưới đây từ console để đổi nhóm LuckPerms. %group% = tên rank.
 # Cần tạo sẵn các nhóm LuckPerms trùng tên rank (xem file luckperms-setup.txt đi kèm).
 # Người mới vào lần đầu cũng được đặt vào nhóm của rank mặc định.
+# Gõ /rank setup MỘT LẦN để plugin tự tạo toàn bộ nhóm LuckPerms và cấp quyền (không cần dán lệnh).
 # Gõ /rank sync để đặt lại nhóm LuckPerms cho tất cả người đang online.
 luckperms:
   enabled: true
@@ -56,7 +57,9 @@ luckperms:
 #   price:       số kim cương để mua (0 = không mua được)
 #   buyable:     false = không cho mua bằng /rank buy (chỉ admin /rank set)
 #   homes:       số home tối đa (chỉ hiển thị, khớp với Essentials)
-#   permissions: quyền cấp thêm. Đặt dấu - trước để tước quyền, VD '-essentials.fly'
+#   permissions: quyền cấp thêm. Rank cao tự có quyền của rank thấp (inherit-permissions).
+#                Đặt dấu - trước để tước quyền, VD '-essentials.hat'. Kit essentials.kits.<rank>
+#                cần bạn tạo kit cùng tên trong Essentials (/createkit vip ...).
 ranks:
   member:
     display: '&7[Member]'
@@ -67,49 +70,63 @@ ranks:
   vip:
     display: '&a[VIP]'
     icon: EMERALD
-    price: 64
+    price: 32
     homes: 2
-    permissions: []
-    # Ví dụ cấp quyền của plugin khác (bỏ dấu # nếu server có plugin đó):
-    # permissions:
-    #   - essentials.back
-    #   - essentials.workbench
+    permissions:
+      - essentials.hat
+      - essentials.nick
+      - essentials.renamehome
+      - essentials.kit
+      - essentials.kits.vip
   vipplus:
     display: '&b[VIP+]'
     icon: DIAMOND
-    price: 160
+    price: 64
     homes: 3
-    permissions: []
+    permissions:
+      - essentials.workbench
+      - essentials.enderchest
+      - essentials.nick.color
+      - essentials.kits.vipplus
   svip:
     display: '&e[SVIP]'
     icon: GOLD_INGOT
-    price: 320
+    price: 96
     homes: 4
-    permissions: []
+    permissions:
+      - essentials.anvil
+      - essentials.teleport.timer.move
+      - essentials.kits.svip
   mvp:
     display: '&6[MVP]'
     icon: AMETHYST_SHARD
-    price: 576
+    price: 128
     homes: 5
-    permissions: []
+    permissions:
+      - essentials.kits.mvp
   mvpplus:
     display: '&d[MVP+]'
     icon: NETHERITE_INGOT
-    price: 960
+    price: 160
     homes: 6
-    permissions: []
+    permissions:
+      - essentials.nick.changecolors
+      - essentials.kits.mvpplus
   elite:
     display: '&5[ELITE]'
     icon: NETHER_STAR
-    price: 1536
+    price: 192
     homes: 7
-    permissions: []
+    permissions:
+      - essentials.kits.elite
   legend:
     display: '&c[LEGEND]'
     icon: DRAGON_EGG
-    price: 2304
+    price: 224
     homes: 8
-    permissions: []
+    permissions:
+      - essentials.teleport.timer.bypass
+      - essentials.kits.legend
   admin:
     display: '&4[Admin]'
     icon: BEACON
@@ -155,12 +172,15 @@ messages:
   bought: '%prefix% &aĐã mua rank %rank% &avới &f%cost% %currency%&a. Bạn có tối đa &f%homes% &ahome!'
   broadcast: '%prefix% &f%player% &7vừa mua rank %rank%&7!'
   rank-set: '%prefix% &aĐã đặt rank của &f%player% &athành %rank%&a.'
+  no-luckperms: '%prefix% &cServer không có LuckPerms.'
+  setup-start: '%prefix% &7Đang tạo nhóm LuckPerms (&f%count% &7lệnh), vui lòng đợi vài chục giây...'
+  setup-done: '%prefix% &aĐã tạo xong nhóm LuckPerms và đặt nhóm cho người đang online.'
   synced: '%prefix% &aĐã đặt lại nhóm LuckPerms cho người chơi đang online.'
   reloaded: '%prefix% &aĐã tải lại cấu hình VipRank!'
   info: '%prefix% &f%player% &7đang có rank %rank% &7(tối đa &f%homes% &7home).'
   list-header: '%prefix% &7Danh sách rank:'
   list-line: ' &8- %rank% &8| &f%price% &8| &f%homes% &7home'
-  usage-rank: '%prefix% &7Cú pháp: &c/rank list &8| &c/rank buy [rank] &8| &c/rank info &8| &c/rank set <tên> <rank> &8| &c/rank sync &8| &c/rank reload'
+  usage-rank: '%prefix% &7Cú pháp: &c/rank list &8| &c/rank buy [rank] &8| &c/rank info &8| &c/rank set <tên> <rank> &8| &c/rank setup &8| &c/rank sync &8| &c/rank reload'
   usage-buy: '%prefix% &7Cú pháp: &c/rank buy <rank>'
   usage-set: '%prefix% &7Cú pháp: &c/rank set <tên> <rank>'
   nothing-to-deposit: '%prefix% &cBạn không có %currency% nào trong túi để nạp.'
